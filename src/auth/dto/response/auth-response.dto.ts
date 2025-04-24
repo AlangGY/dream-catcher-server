@@ -5,14 +5,20 @@ export class AuthDataDto {
   @ApiProperty({ description: '사용자 ID' })
   userId: string;
 
-  @ApiProperty({ description: 'JWT 토큰', required: false })
-  token?: string;
+  @ApiProperty({ description: 'JWT 액세스 토큰' })
+  accessToken: string;
 
-  @ApiProperty({ description: '사용자 이름', required: false })
-  name?: string;
+  @ApiProperty({ description: 'JWT 리프레시 토큰', required: false })
+  refreshToken?: string;
 
-  @ApiProperty({ description: '이메일 주소', required: false })
-  email?: string;
+  @ApiProperty({ description: '사용자 이름/닉네임' })
+  nickname: string;
+
+  @ApiProperty({ description: '이메일 주소' })
+  email: string;
+
+  @ApiProperty({ description: '프로필 이미지 URL', required: false })
+  profileImage?: string;
 
   static _type = AuthDataDto;
 }

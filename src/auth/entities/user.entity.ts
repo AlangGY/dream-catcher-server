@@ -1,3 +1,4 @@
+import { Dream } from 'src/dreams/entities/dream.entity';
 import {
   Column,
   CreateDateColumn,
@@ -6,7 +7,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { Dream } from '../../dreams/entities/dream.entity';
+import { OAuthCredential } from './oauth-credential.entity';
 
 @Entity()
 export class User {
@@ -16,17 +17,23 @@ export class User {
   @Column({ unique: true })
   email: string;
 
-  @Column()
-  password: string;
+  @Column({ nullable: true })
+  password?: string;
 
   @Column()
-  name: string;
+  nickname: string;
 
   @Column({ nullable: true })
   profileImage?: string;
 
   @OneToMany(() => Dream, (dream) => dream.user)
   dreams: Dream[];
+
+  @Column({ nullable: true })
+  refreshToken?: string;
+
+  @OneToMany(() => OAuthCredential, (credential) => credential.user)
+  oauthCredentials: OAuthCredential[];
 
   @CreateDateColumn()
   createdAt: Date;
