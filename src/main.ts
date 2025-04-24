@@ -1,6 +1,10 @@
 import { ValidationPipe } from '@nestjs/common';
-import { NestFactory } from '@nestjs/core';
+import { ConfigService } from '@nestjs/config';
+import { NestFactory, Reflector } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { DevAuthGuard } from 'src/auth/guards/dev-auth.guard';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { UserRepository } from 'src/auth/repositories/user.repository';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
@@ -8,6 +12,17 @@ async function bootstrap() {
 
   app.setGlobalPrefix('v1');
   app.useGlobalPipes(new ValidationPipe());
+
+  // 글로벌 가드 설정
+  // DevAuthGuard가 먼저 실행되고, 그 다음에 JwtAuthGuard가 실행됨
+  app.useGlobalGuards(
+    new DevAuthGuard(
+      app.get(Reflector),
+      app.get(ConfigService),
+      app.get(UserRepository),
+    ),
+    new JwtAuthGuard(app.get(Reflector), app.get(ConfigService)),
+  );
 
   const config = new DocumentBuilder()
     .setTitle('Dream Catcher API')
