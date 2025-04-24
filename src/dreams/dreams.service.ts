@@ -1,0 +1,124 @@
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { TransactionService } from '../common/services/transaction.service';
+import { CreateDreamDto } from './dto/request/create-dream.dto';
+import { GetDreamsDto } from './dto/request/get-dreams.dto';
+import { UpdateDreamDto } from './dto/request/update-dream.dto';
+import {
+  DreamListResponseData,
+  DreamListResponseDto,
+  DreamResponseDto,
+} from './dto/response/dream-response.dto';
+import { DreamRepository } from './repository/dream.repository';
+
+export interface IDreamsService {
+  createDream(createDreamDto: CreateDreamDto): Promise<DreamResponseDto>;
+  getDreams(getDreamsDto: GetDreamsDto): Promise<DreamListResponseDto>;
+  getDream(id: string): Promise<DreamResponseDto>;
+  updateDream(
+    id: string,
+    updateDreamDto: UpdateDreamDto,
+  ): Promise<DreamResponseDto>;
+  deleteDream(id: string): Promise<DreamResponseDto>;
+  analyzeDream(id: string): Promise<DreamResponseDto>;
+}
+
+@Injectable()
+export class DreamsService implements IDreamsService {
+  constructor(
+    private readonly dreamRepository: DreamRepository,
+    private readonly transactionService: TransactionService,
+  ) {}
+
+  async createDream(createDreamDto: CreateDreamDto): Promise<DreamResponseDto> {
+    const dream = await this.transactionService.runInTransaction((manager) =>
+      this.dreamRepository.createDream(createDreamDto, manager),
+    );
+    return DreamResponseDto.success(dream);
+  }
+
+  async getDreams(getDreamsDto: GetDreamsDto): Promise<DreamListResponseDto> {
+    const [dreams, total] = await this.dreamRepository.findDreams(getDreamsDto);
+    const totalPages = Math.ceil(total / getDreamsDto.limit);
+
+    const responseData: DreamListResponseData = {
+      dreams,
+      pagination: {
+        totalItems: total,
+        totalPages,
+        currentPage: getDreamsDto.page,
+      },
+    };
+
+    return DreamListResponseDto.success(responseData);
+  }
+
+  async getDream(id: string): Promise<DreamResponseDto> {
+    const dream = await this.dreamRepository.findDreamById(id);
+    if (!dream) {
+      throw new NotFoundException('해당하는 꿈 기록을 찾을 수 없습니다.');
+    }
+
+    return DreamResponseDto.success(dream);
+  }
+
+  async updateDream(
+    id: string,
+    updateDreamDto: UpdateDreamDto,
+  ): Promise<DreamResponseDto> {
+    return this.transactionService.runInTransaction(async (manager) => {
+      const dream = await this.dreamRepository.findDreamById(id, manager);
+      if (!dream) {
+        throw new NotFoundException('해당하는 꿈 기록을 찾을 수 없습니다.');
+      }
+
+      await this.dreamRepository.updateDream(id, updateDreamDto, manager);
+      const updatedDream = await this.dreamRepository.findDreamById(
+        id,
+        manager,
+      );
+
+      return DreamResponseDto.success(updatedDream);
+    });
+  }
+
+  async deleteDream(id: string): Promise<DreamResponseDto> {
+    return this.transactionService.runInTransaction(async (manager) => {
+      const dream = await this.dreamRepository.findDreamById(id, manager);
+      if (!dream) {
+        throw new NotFoundException('해당하는 꿈 기록을 찾을 수 없습니다.');
+      }
+
+      await this.dreamRepository.deleteDream(dream, manager);
+
+      return DreamResponseDto.success({
+        message: '꿈 기록이 성공적으로 삭제되었습니다.',
+      } as any);
+    });
+  }
+
+  async analyzeDream(id: string): Promise<DreamResponseDto> {
+    return this.transactionService.runInTransaction(async (manager) => {
+      const dream = await this.dreamRepository.findDreamById(id, manager);
+      if (!dream) {
+        throw new NotFoundException('해당하는 꿈 기록을 찾을 수 없습니다.');
+      }
+
+      const analysis = {
+        interpretation: '샘플 해석',
+        keywords: ['샘플'],
+        emotionalTone: '긍정적',
+        suggestedActions: ['행복에 대해 생각해보기'],
+        summary: '꿈 요약',
+        sentiment: '긍정적',
+      };
+
+      await this.dreamRepository.updateDreamAnalysis(id, analysis, manager);
+      const analyzedDream = await this.dreamRepository.findDreamById(
+        id,
+        manager,
+      );
+
+      return DreamResponseDto.success(analyzedDream);
+    });
+  }
+}
