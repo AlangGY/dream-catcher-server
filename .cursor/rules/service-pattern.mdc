@@ -1,0 +1,29 @@
+---
+description: 
+globs: *.service.ts
+alwaysApply: false
+---
+# Service Pattern Guide
+
+## Interface Definition
+각 서비스는 동일 파일 내에 인터페이스를 정의하여 public API를 명시합니다.
+예시: [auth.service.ts](mdc:src/auth/auth.service.ts)
+
+```typescript
+interface IAuthService {
+  register(registerDto: RegisterRequestDto): Promise<AuthResponseDto>;
+  login(loginDto: LoginRequestDto): Promise<AuthResponseDto>;
+  // ... other methods
+}
+
+@Injectable()
+export class AuthService implements IAuthService {
+  // implementation
+}
+```
+
+## 규칙
+1. 인터페이스 이름은 'I' 접두사를 사용합니다 (e.g., `IAuthService`)
+2. 서비스 클래스는 해당 인터페이스를 구현합니다
+3. 모든 public 메서드는 인터페이스에 정의되어야 합니다
+

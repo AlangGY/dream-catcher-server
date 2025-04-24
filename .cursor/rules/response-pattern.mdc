@@ -1,0 +1,27 @@
+---
+description: 
+globs: src/**/response/*
+alwaysApply: false
+---
+# Response Pattern Guide
+
+## Common Response Pattern
+모든 API 응답은 [common-response.dto.ts](mdc:src/common/dto/response/common-response.dto.ts)를 기반으로 합니다.
+
+```typescript
+class CommonResponseDto<T> {
+  status: 'success' | 'error';
+  data: T | null;
+  error?: ErrorResponseDto;
+}
+```
+
+## Domain Specific Response
+각 도메인별 응답 DTO는 CommonResponseDto를 상속받아 사용합니다.
+
+예시: [auth-response.dto.ts](mdc:src/auth/dto/response/auth-response.dto.ts)
+
+```typescript
+export class AuthResponseDto extends CommonResponseDto<AuthDataDto> {}
+```
+

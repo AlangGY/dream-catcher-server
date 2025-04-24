@@ -1,0 +1,64 @@
+---
+description: task when doing injecting dependency
+globs: 
+alwaysApply: false
+---
+# 의존성 주입 패턴 가이드
+
+## 기본 원칙
+
+1. 인터페이스와 구현체 분리
+```typescript
+// 인터페이스 정의
+export interface ITransactionService {
+  runInTransaction<T>(operation: (entityManager: EntityManager) => Promise<T>): Promise<T>;
+}
+
+// 구현체
+@Injectable()
+export class TransactionService implements ITransactionService {
+  // 구현
+}
+```
+
+2. 모듈 설정
+```typescript
+@Module({
+  providers: [TransactionService],
+  exports: [TransactionService]
+})
+export class CommonModule {}
+```
+
+3. 생성자 주입
+```typescript
+@Injectable()
+export class DreamsService implements IDreamsService {
+  constructor(
+    private readonly dreamRepository: DreamRepository,
+    private readonly transactionService: TransactionService,
+  ) {}
+}
+```
+
+## 네이밍 컨벤션
+
+1. 인터페이스
+- 'I' 접두사 사용 (e.g., `ITransactionService`)
+- 기능을 명확하게 설명하는 이름 사용
+
+2. 구현체
+- 'I' 접두사를 제거한 인터페이스 명칭 사용 (e.g., `TransactionService`)
+
+## 모듈 구성
+
+각 모듈은 다음과 같이 구성:
+
+1. 공통 모듈 [common.module.ts](mdc:src/common/common.module.ts)
+- 재사용 가능한 서비스 제공
+- 명시적인 exports를 통한 기능 노출
+
+2. 도메인 모듈 [dreams.module.ts](mdc:src/dreams/dreams.module.ts)
+- 필요한 공통 모듈 imports
+- 도메인 특화 서비스 제공
+- 명시적인 exports를 통한 기능 노출

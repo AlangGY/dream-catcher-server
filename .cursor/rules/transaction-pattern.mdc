@@ -1,0 +1,81 @@
+---
+description: transaction 처리 기능 구현이 필요할떄
+globs: 
+alwaysApply: false
+---
+# 트랜잭션 관리 패턴 가이드
+
+## 트랜잭션 서비스
+
+공통 모듈의 [transaction.service.ts](mdc:src/common/services/transaction.service.ts)를 통해 트랜잭션 관리:
+
+```typescript
+export interface TransactionService {
+  runInTransaction<T>(
+    operation: (entityManager: EntityManager) => Promise<T>,
+  ): Promise<T>;
+}
+```
+
+## 레포지토리 패턴
+
+1. EntityManager 주입
+```typescript
+export interface DreamRepository {
+  createDream(
+    createDreamDto: CreateDreamDto,
+    entityManager?: EntityManager,
+  ): Promise<DreamDto>;
+}
+```
+
+2. EntityManager 처리
+```typescript
+@Injectable()
+export class DreamRepositoryImpl implements DreamRepository {
+  private getManager(entityManager?: EntityManager): EntityManager {
+    return entityManager || this.dataSource.manager;
+  }
+}
+```
+
+## 트랜잭션 사용
+
+1. 서비스 레이어에서 트랜잭션 관리
+```typescript
+@Injectable()
+export class DreamsServiceImpl implements DreamsService {
+  async createDream(createDreamDto: CreateDreamDto): Promise<DreamResponseDto> {
+    return this.transactionService.runInTransaction(async (manager) => {
+      const dream = await this.dreamRepository.createDream(createDreamDto, manager);
+      return DreamResponseDto.success(dream);
+    });
+  }
+}
+```
+
+2. 여러 작업을 하나의 트랜잭션으로 처리
+```typescript
+async updateDream(id: string, updateDreamDto: UpdateDreamDto): Promise<DreamResponseDto> {
+  return this.transactionService.runInTransaction(async (manager) => {
+    const dream = await this.dreamRepository.findDreamById(id, manager);
+    if (!dream) {
+      throw new NotFoundException();
+    }
+
+    await this.dreamRepository.updateDream(id, updateDreamDto, manager);
+    const updatedDream = await this.dreamRepository.findDreamById(id, manager);
+    return DreamResponseDto.success(updatedDream);
+  });
+}
+```
+
+## 주의사항
+
+1. 읽기 전용 작업
+- 단순 조회는 트랜잭션 불필요
+- 성능 최적화를 위해 트랜잭션 제외
+
+2. 트랜잭션 범위
+- 비즈니스 로직 단위로 트랜잭션 범위 설정
+- 여러 레포지토리 작업이 하나의 논리적 단위인 경우 하나의 트랜잭션으로 처리

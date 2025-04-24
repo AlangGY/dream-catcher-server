@@ -1,0 +1,49 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Module Dependency Guide
+
+## 의존성 주입 패턴
+모든 의존성은 생성자를 통해 주입받습니다:
+
+```typescript
+@Injectable()
+export class SomeService {
+  constructor(
+    private readonly someRepository: Repository<SomeEntity>,
+    private readonly otherService: OtherService,
+  ) {}
+}
+```
+
+## 모듈 정의
+각 모듈은 `@Module` 데코레이터를 통해 의존성을 명시적으로 선언합니다:
+
+```typescript
+@Module({
+  imports: [
+    TypeOrmModule.forFeature([User]),
+    JwtModule.register(jwtConfig),
+  ],
+  controllers: [AuthController],
+  providers: [AuthService],
+  exports: [AuthService],
+})
+export class AuthModule {}
+```
+
+## 의존성 관리 규칙
+1. 순환 참조 금지
+   - 모듈 A가 모듈 B를 참조하면, 모듈 B는 모듈 A를 직접 참조할 수 없음
+   - 필요한 경우 이벤트 기반 통신 사용
+
+2. 공통 모듈 분리
+   - 여러 모듈에서 공통으로 사용되는 기능은 `common` 모듈로 분리
+   - 예: [common-response.dto.ts](mdc:src/common/dto/response/common-response.dto.ts)
+
+3. 모듈 경계
+   - 각 모듈은 독립적으로 동작할 수 있어야 함
+   - 모듈 내부 구현은 외부에 노출되지 않아야 함
+   - Public API는 인터페이스를 통해 명시적으로 정의

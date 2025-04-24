@@ -1,0 +1,82 @@
+---
+description: 
+globs: *.repository.ts
+alwaysApply: false
+---
+# 레포지토리 패턴 가이드
+
+## 기본 구조
+
+레포지토리는 도메인 엔티티에 대한 영속성 작업을 담당:
+
+1. 인터페이스 정의 [dream.repository.ts](mdc:src/dreams/repository/dream.repository.ts)
+```typescript
+export interface IDreamRepository {
+  createDream(createDreamDto: CreateDreamDto, entityManager?: EntityManager): Promise<DreamDto>;
+  findDreamById(id: string, entityManager?: EntityManager): Promise<DreamDto | null>;
+  findDreams(getDreamsDto: GetDreamsDto, entityManager?: EntityManager): Promise<[DreamDto[], number]>;
+  // ... 기타 메서드
+}
+```
+
+2. 구현체
+```typescript
+@Injectable()
+export class DreamRepository implements IDreamRepository {
+  constructor(private dataSource: DataSource) {}
+
+  private getManager(entityManager?: EntityManager): EntityManager {
+    return entityManager || this.dataSource.manager;
+  }
+}
+```
+
+## 메서드 네이밍
+
+1. 조회 메서드
+- `findXXX`: 단일 엔티티 조회
+- `findXXXs`: 복수 엔티티 조회
+- `getXXX`: 없으면 예외 발생
+
+2. 수정 메서드
+- `createXXX`: 새로운 엔티티 생성
+- `updateXXX`: 기존 엔티티 수정
+- `deleteXXX`: 엔티티 삭제
+
+## DTO 변환
+
+엔티티와 DTO 간의 변환은 레포지토리 책임:
+
+```typescript
+private toDreamDto(dream: Dream): DreamDto {
+  const { ...dreamDto } = dream;
+  return dreamDto;
+}
+```
+
+## 쿼리 작성
+
+1. 기본 쿼리
+```typescript
+const dream = await manager.findOne(Dream, { where: { id } });
+```
+
+2. 페이지네이션
+```typescript
+const [dreams, total] = await manager.findAndCount(Dream, {
+  where: { userId },
+  skip,
+  take: limit,
+  order: { date: 'DESC' },
+});
+```
+
+## 주의사항
+
+1. 트랜잭션 처리
+- EntityManager를 선택적 매개변수로 받음
+- 트랜잭션 컨텍스트 공유 가능
+
+2. 비즈니스 로직 배제
+- 순수하게 데이터 접근 로직만 포함
+- 비즈니스 로직은 서비스 레이어에서 처리
