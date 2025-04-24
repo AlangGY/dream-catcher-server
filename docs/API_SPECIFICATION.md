@@ -343,21 +343,27 @@
 }
 ```
 
-## WebRTC 시그널링 API
+## OpenAI API
 
-### 시그널링 서버 연결
+### WebRTC 인증키 발급
 
-- **WebSocket** `/ws/signaling`
-
-### 시그널링 메시지 포맷
+- **POST** `/openai/auth/webrtc`
 
 ```json
+// Request
+{
+  "userId": "string"
+}
+
+// Response
+{
+  "status": "success",
 // 시그널링 메시지
 {
   "type": "string", // "offer" | "answer" | "ice-candidate"
   "sessionId": "string",
   "data": {
-    // WebRTC 시그널링 데이터
+    "ephemeralKey": "string",
   }
 }
 ```
