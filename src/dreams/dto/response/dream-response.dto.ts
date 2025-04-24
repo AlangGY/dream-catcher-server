@@ -12,9 +12,13 @@ export class DreamListResponseData {
     totalPages: number;
     totalItems: number;
   };
-
-  static _type = DreamListResponseData;
 }
 
-export class DreamResponseDto extends CommonResponseDto<DreamDto> {}
-export class DreamListResponseDto extends CommonResponseDto<DreamListResponseData> {}
+export class DreamResponseDto extends CommonResponseDto<DreamDto> {
+  @ApiProperty({ type: DreamDto })
+  data: DreamDto;
+}
+export class DreamListResponseDto extends CommonResponseDto<DreamListResponseData> {
+  @ApiProperty({ type: DreamListResponseData })
+  data: DreamListResponseData;
+}

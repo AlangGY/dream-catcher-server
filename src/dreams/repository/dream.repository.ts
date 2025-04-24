@@ -1,15 +1,17 @@
 import { Injectable } from '@nestjs/common';
 import { DataSource, EntityManager } from 'typeorm';
-import { CreateDreamDto } from '../dto/request/create-dream.dto';
-import { GetDreamsDto } from '../dto/request/get-dreams.dto';
-import { UpdateDreamDto } from '../dto/request/update-dream.dto';
 import { DreamAnalysisDto } from '../dto/response/dream-analysis.dto';
 import { DreamDto } from '../dto/response/dream.dto';
 import { Dream } from '../entities/dream.entity';
+import {
+  CreateDreamWithUserId,
+  GetDreamsWithUserId,
+  UpdateDreamWithUserId,
+} from '../interfaces/interfaces';
 
 export interface IDreamRepository {
   createDream(
-    createDreamDto: CreateDreamDto,
+    createDreamDto: CreateDreamWithUserId,
     entityManager?: EntityManager,
   ): Promise<DreamDto>;
   findDreamById(
@@ -17,12 +19,12 @@ export interface IDreamRepository {
     entityManager?: EntityManager,
   ): Promise<DreamDto | null>;
   findDreams(
-    getDreamsDto: GetDreamsDto,
+    getDreamsDto: GetDreamsWithUserId,
     entityManager?: EntityManager,
   ): Promise<[DreamDto[], number]>;
   updateDream(
     id: string,
-    updateDreamDto: UpdateDreamDto,
+    updateDreamDto: UpdateDreamWithUserId,
     entityManager?: EntityManager,
   ): Promise<void>;
   updateDreamAnalysis(
@@ -42,7 +44,7 @@ export class DreamRepository implements IDreamRepository {
   }
 
   async createDream(
-    createDreamDto: CreateDreamDto,
+    createDreamDto: CreateDreamWithUserId,
     entityManager?: EntityManager,
   ): Promise<DreamDto> {
     const manager = this.getManager(entityManager);
@@ -61,7 +63,7 @@ export class DreamRepository implements IDreamRepository {
   }
 
   async findDreams(
-    getDreamsDto: GetDreamsDto,
+    getDreamsDto: GetDreamsWithUserId,
     entityManager?: EntityManager,
   ): Promise<[DreamDto[], number]> {
     const manager = this.getManager(entityManager);
@@ -80,7 +82,7 @@ export class DreamRepository implements IDreamRepository {
 
   async updateDream(
     id: string,
-    updateDreamDto: UpdateDreamDto,
+    updateDreamDto: UpdateDreamWithUserId,
     entityManager?: EntityManager,
   ): Promise<void> {
     const manager = this.getManager(entityManager);

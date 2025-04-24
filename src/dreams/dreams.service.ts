@@ -1,8 +1,10 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  CreateDreamWithUserId,
+  GetDreamsWithUserId,
+  UpdateDreamWithUserId,
+} from 'src/dreams/interfaces/interfaces';
 import { TransactionService } from '../common/services/transaction.service';
-import { CreateDreamDto } from './dto/request/create-dream.dto';
-import { GetDreamsDto } from './dto/request/get-dreams.dto';
-import { UpdateDreamDto } from './dto/request/update-dream.dto';
 import {
   DreamListResponseData,
   DreamListResponseDto,
@@ -11,12 +13,14 @@ import {
 import { DreamRepository } from './repository/dream.repository';
 
 export interface IDreamsService {
-  createDream(createDreamDto: CreateDreamDto): Promise<DreamResponseDto>;
-  getDreams(getDreamsDto: GetDreamsDto): Promise<DreamListResponseDto>;
+  createDream(
+    createDreamWithUserId: CreateDreamWithUserId,
+  ): Promise<DreamResponseDto>;
+  getDreams(getDreamsDto: GetDreamsWithUserId): Promise<DreamListResponseDto>;
   getDream(id: string): Promise<DreamResponseDto>;
   updateDream(
     id: string,
-    updateDreamDto: UpdateDreamDto,
+    updateDreamDto: UpdateDreamWithUserId,
   ): Promise<DreamResponseDto>;
   deleteDream(id: string): Promise<DreamResponseDto>;
   analyzeDream(id: string): Promise<DreamResponseDto>;
@@ -29,14 +33,18 @@ export class DreamsService implements IDreamsService {
     private readonly transactionService: TransactionService,
   ) {}
 
-  async createDream(createDreamDto: CreateDreamDto): Promise<DreamResponseDto> {
+  async createDream(
+    createDreamDto: CreateDreamWithUserId,
+  ): Promise<DreamResponseDto> {
     const dream = await this.transactionService.runInTransaction((manager) =>
       this.dreamRepository.createDream(createDreamDto, manager),
     );
     return DreamResponseDto.success(dream);
   }
 
-  async getDreams(getDreamsDto: GetDreamsDto): Promise<DreamListResponseDto> {
+  async getDreams(
+    getDreamsDto: GetDreamsWithUserId,
+  ): Promise<DreamListResponseDto> {
     const [dreams, total] = await this.dreamRepository.findDreams(getDreamsDto);
     const totalPages = Math.ceil(total / getDreamsDto.limit);
 
@@ -63,7 +71,7 @@ export class DreamsService implements IDreamsService {
 
   async updateDream(
     id: string,
-    updateDreamDto: UpdateDreamDto,
+    updateDreamDto: UpdateDreamWithUserId,
   ): Promise<DreamResponseDto> {
     return this.transactionService.runInTransaction(async (manager) => {
       const dream = await this.dreamRepository.findDreamById(id, manager);

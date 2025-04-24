@@ -41,6 +41,4 @@ export class DreamDto {
 
   @ApiProperty({ description: '수정 일시' })
   updatedAt: Date;
-
-  static _type = DreamDto;
 }

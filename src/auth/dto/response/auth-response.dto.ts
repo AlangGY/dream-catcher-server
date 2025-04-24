@@ -19,8 +19,9 @@ export class AuthDataDto {
 
   @ApiProperty({ description: '프로필 이미지 URL', required: false })
   profileImage?: string;
-
-  static _type = AuthDataDto;
 }
 
-export class AuthResponseDto extends CommonResponseDto<AuthDataDto> {}
+export class AuthResponseDto extends CommonResponseDto<AuthDataDto> {
+  @ApiProperty({ type: AuthDataDto })
+  data: AuthDataDto;
+}

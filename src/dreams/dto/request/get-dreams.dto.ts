@@ -12,7 +12,4 @@ export class GetDreamsDto {
 
   @ApiProperty({ description: '조회 종료 날짜', required: false })
   endDate?: string;
-
-  @ApiProperty({ description: '사용자 ID' })
-  userId: string;
 }

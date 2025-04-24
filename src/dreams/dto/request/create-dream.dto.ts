@@ -24,13 +24,4 @@ export class CreateDreamDto {
   @IsString()
   @IsNotEmpty()
   mood: string;
-
-  // TODO: 제거
-  @ApiProperty({
-    description: '사용자 ID',
-    example: 'b17bcaa1-0a4d-4cff-99ad-c2b6663cfdb5',
-  })
-  @IsString()
-  @IsNotEmpty()
-  userId: string;
 }

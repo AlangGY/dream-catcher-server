@@ -10,11 +10,14 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import {
+  ApiBadRequestResponse,
   ApiBearerAuth,
+  ApiCreatedResponse,
   ApiOperation,
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
+import { ErrorResponseDto } from 'src/common/dto/response/common-response.dto';
 import { GetDreamsDto } from 'src/dreams/dto/request/get-dreams.dto';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { User } from '../auth/entities/user.entity';
@@ -26,6 +29,11 @@ import {
   DreamListResponseDto,
   DreamResponseDto,
 } from './dto/response/dream-response.dto';
+import {
+  CreateDreamWithUserId,
+  GetDreamsWithUserId,
+  UpdateDreamWithUserId,
+} from './interfaces/interfaces';
 
 @ApiTags('꿈')
 @ApiBearerAuth('access-token')
@@ -35,20 +43,18 @@ export class DreamsController {
   constructor(private readonly dreamsService: DreamsService) {}
 
   @ApiOperation({ summary: '꿈 기록 생성' })
-  @ApiResponse({
-    status: 201,
-    description: '꿈 기록 생성 성공',
-    type: DreamResponseDto,
-  })
+  @ApiCreatedResponse({ type: DreamResponseDto })
+  @ApiBadRequestResponse({ type: ErrorResponseDto })
   @Post()
   async createDream(
     @Body() createDreamDto: CreateDreamDto,
     @CurrentUser() user: User,
   ): Promise<DreamResponseDto> {
-    return this.dreamsService.createDream({
+    const dreamWithUserId: CreateDreamWithUserId = {
       ...createDreamDto,
       userId: user.id,
-    });
+    };
+    return this.dreamsService.createDream(dreamWithUserId);
   }
 
   @ApiOperation({ summary: '꿈 기록 목록 조회' })
@@ -60,15 +66,13 @@ export class DreamsController {
   @Get()
   async getDreams(
     @CurrentUser() user: User,
-    @Query() { limit, page, endDate, startDate }: Omit<GetDreamsDto, 'userId'>,
+    @Query() getDreamsDto: GetDreamsDto,
   ): Promise<DreamListResponseDto> {
-    return this.dreamsService.getDreams({
-      page,
-      limit,
-      startDate,
-      endDate,
+    const dreamsWithUserId: GetDreamsWithUserId = {
+      ...getDreamsDto,
       userId: user.id,
-    });
+    };
+    return this.dreamsService.getDreams(dreamsWithUserId);
   }
 
   @ApiOperation({ summary: '꿈 기록 상세 조회' })
@@ -92,8 +96,13 @@ export class DreamsController {
   async updateDream(
     @Param('dreamId') dreamId: string,
     @Body() updateDreamDto: UpdateDreamDto,
+    @CurrentUser() user: User,
   ): Promise<DreamResponseDto> {
-    return this.dreamsService.updateDream(dreamId, updateDreamDto);
+    const dreamWithUserId: UpdateDreamWithUserId = {
+      ...updateDreamDto,
+      userId: user.id,
+    };
+    return this.dreamsService.updateDream(dreamId, dreamWithUserId);
   }
 
   @ApiOperation({ summary: '꿈 기록 삭제' })

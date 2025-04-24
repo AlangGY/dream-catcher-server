@@ -14,15 +14,8 @@ export class CommonResponseDto<T> {
   status: 'success' | 'error';
 
   @ApiProperty({ description: '응답 데이터' })
-  @Type(({ object }) => (object.constructor as any)._type)
+  @Type(({ object }) => object.constructor)
   data: T | null;
-
-  @ApiProperty({
-    description: '에러 정보',
-    type: ErrorResponseDto,
-    required: false,
-  })
-  error?: ErrorResponseDto;
 
   static success<T>(data: T): CommonResponseDto<T> {
     const response = new CommonResponseDto<T>();
@@ -31,11 +24,10 @@ export class CommonResponseDto<T> {
     return response;
   }
 
-  static error(code: string, message: string): CommonResponseDto<null> {
-    const response = new CommonResponseDto<null>();
-    response.status = 'error';
-    response.data = null;
-    response.error = { code, message };
+  static error(code: string, message: string): ErrorResponseDto {
+    const response = new ErrorResponseDto();
+    response.code = code;
+    response.message = message;
     return response;
   }
 }
