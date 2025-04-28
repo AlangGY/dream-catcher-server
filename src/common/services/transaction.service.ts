@@ -8,7 +8,7 @@ export interface ITransactionService {
 }
 
 @Injectable()
-export class TransactionService implements TransactionService {
+export class TransactionService implements ITransactionService {
   constructor(private readonly dataSource: DataSource) {}
 
   async runInTransaction<T>(
