@@ -24,4 +24,12 @@ export class CreateDreamDto {
   @IsString()
   @IsNotEmpty()
   mood: string;
+
+  @ApiProperty({
+    description: '꿈의 색상',
+    example: '#000000',
+  })
+  @IsString()
+  @IsNotEmpty()
+  color: string;
 }

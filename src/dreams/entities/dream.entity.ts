@@ -26,6 +26,9 @@ export class Dream {
   @Column()
   mood: string;
 
+  @Column()
+  color: string;
+
   @Column('json', { nullable: true })
   analysis?: DreamAnalysisDto;
 

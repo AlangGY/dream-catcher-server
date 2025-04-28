@@ -30,6 +30,9 @@ export class DreamDto {
   @ApiProperty({ description: '감정 상태' })
   mood: string;
 
+  @ApiProperty({ description: '꿈의 색상' })
+  color: string;
+
   @ApiProperty({ description: '사용자 ID' })
   userId: string;
 
