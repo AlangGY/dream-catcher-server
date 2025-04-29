@@ -7,7 +7,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { User } from '../../auth/entities/user.entity';
-import { DreamAnalysisDto } from '../dto/response/dream.dto';
+import { DreamAnalysisDto } from '../dto/response/dream-analysis.dto';
 
 @Entity()
 export class Dream {

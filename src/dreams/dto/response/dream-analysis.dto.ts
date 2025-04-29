@@ -1,6 +1,6 @@
 export class DreamAnalysisDto {
   keywords: string[];
-  summary: string;
+  clarity: number;
+  vividness: number;
   interpretation: string;
-  sentiment: string;
 }

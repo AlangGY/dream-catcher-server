@@ -11,6 +11,7 @@ import {
   UpdateDreamWithUserId,
 } from 'src/dreams/interfaces/interfaces';
 import { DreamRepository } from 'src/dreams/repository/dream.repository';
+import { OpenAiService } from 'src/openai/services/openai.service';
 
 export interface IDreamsService {
   createDream(
@@ -30,6 +31,7 @@ export interface IDreamsService {
 export class DreamsService implements IDreamsService {
   constructor(
     private readonly dreamRepository: DreamRepository,
+    private readonly openAiService: OpenAiService,
     private readonly transactionService: TransactionService,
   ) {}
 
@@ -104,25 +106,22 @@ export class DreamsService implements IDreamsService {
     });
   }
 
-  async analyzeDream(id: string): Promise<DreamResponseDto> {
+  async analyzeDream(dreamId: string): Promise<DreamResponseDto> {
     return this.transactionService.runInTransaction(async (manager) => {
-      const dream = await this.dreamRepository.findDreamById(id, manager);
+      const dream = await this.dreamRepository.findDreamById(dreamId, manager);
       if (!dream) {
         throw new NotFoundException('해당하는 꿈 기록을 찾을 수 없습니다.');
       }
 
-      const analysis = {
-        interpretation: '샘플 해석',
-        keywords: ['샘플'],
-        emotionalTone: '긍정적',
-        suggestedActions: ['행복에 대해 생각해보기'],
-        summary: '꿈 요약',
-        sentiment: '긍정적',
-      };
+      const analysis = await this.openAiService.analyzeDream(dream);
 
-      await this.dreamRepository.updateDreamAnalysis(id, analysis, manager);
+      await this.dreamRepository.updateDreamAnalysis(
+        dreamId,
+        analysis,
+        manager,
+      );
       const analyzedDream = await this.dreamRepository.findDreamById(
-        id,
+        dreamId,
         manager,
       );
 

@@ -6,6 +6,7 @@ import {
 import { TransactionService } from 'src/common/services/transaction.service';
 import { DreamInterviewRepository } from 'src/dreams/repository/dream-interview.repository';
 import { DreamRepository } from 'src/dreams/repository/dream.repository';
+import { DreamsService } from 'src/dreams/services/dreams.service';
 import { OpenAiService } from '../../openai/services/openai.service';
 import { AnswerDreamInterviewDto } from '../dto/request/answer-dream-interview.dto';
 import {
@@ -24,6 +25,7 @@ export class DreamInterviewService {
     private readonly interviewRepo: DreamInterviewRepository,
     private readonly dreamRepo: DreamRepository,
     private readonly openAiService: OpenAiService,
+    private readonly dreamsService: DreamsService,
     private readonly transactionService: TransactionService,
   ) {}
 
@@ -144,6 +146,7 @@ export class DreamInterviewService {
           userId,
         }),
       )
+      .then((dream) => this.dreamsService.analyzeDream(dream.id))
       .then(() =>
         this.interviewRepo.updateInterview({
           id: interviewId,

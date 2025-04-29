@@ -1,18 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-
-export class DreamAnalysisDto {
-  @ApiProperty({ description: '꿈 해석' })
-  interpretation: string;
-
-  @ApiProperty({ description: '키워드 목록' })
-  keywords: string[];
-
-  @ApiProperty({ description: '감정 톤' })
-  emotionalTone: string;
-
-  @ApiProperty({ description: '제안 행동' })
-  suggestedActions: string[];
-}
+import { DreamAnalysisDto } from 'src/dreams/dto/response/dream-analysis.dto';
 
 export class DreamDto {
   @ApiProperty({ description: '꿈 ID' })
