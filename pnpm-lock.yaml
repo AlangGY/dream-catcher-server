@@ -49,7 +49,7 @@ importers:
         version: 0.14.1
       openai:
         specifier: ^4.96.0
-        version: 4.96.0
+        version: 4.96.0(zod@3.24.3)
       passport:
         specifier: ^0.7.0
         version: 0.7.0
@@ -71,6 +71,9 @@ importers:
       typeorm:
         specifier: ^0.3.22
         version: 0.3.22(pg@8.15.5)(reflect-metadata@0.2.2)(ts-node@10.9.2(@types/node@20.17.30)(typescript@5.8.3))
+      zod:
+        specifier: ^3.24.3
+        version: 3.24.3
     devDependencies:
       '@nestjs/cli':
         specifier: ^10.0.0
@@ -3479,6 +3482,9 @@ packages:
     resolution: {integrity: sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==}
     engines: {node: '>=10'}
 
+  zod@3.24.3:
+    resolution: {integrity: sha512-HhY1oqzWCQWuUqvBFnsyrtZRhyPeR7SUGv+C4+MsisMuVfSPx8HpwWqH8tRahSlt6M3PiFAcoeFhZAqIXTxoSg==}
+
 snapshots:
 
   '@ampproject/remapping@2.3.0':
@@ -6344,7 +6350,7 @@ snapshots:
     dependencies:
       mimic-fn: 2.1.0
 
-  openai@4.96.0:
+  openai@4.96.0(zod@3.24.3):
     dependencies:
       '@types/node': 18.19.87
       '@types/node-fetch': 2.6.12
@@ -6353,6 +6359,8 @@ snapshots:
       form-data-encoder: 1.7.2
       formdata-node: 4.4.1
       node-fetch: 2.7.0
+    optionalDependencies:
+      zod: 3.24.3
     transitivePeerDependencies:
       - encoding
 
@@ -7260,3 +7268,5 @@ snapshots:
   yn@3.1.1: {}
 
   yocto-queue@0.1.0: {}
+
+  zod@3.24.3: {}

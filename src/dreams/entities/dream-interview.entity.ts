@@ -10,6 +10,7 @@ import { DreamInterviewMessageEntity } from './dream-interview-question.entity';
 
 export enum DreamInterviewStatus {
   IN_PROGRESS = 'IN_PROGRESS',
+  CONVERTING = 'CONVERTING',
   COMPLETED = 'COMPLETED',
   CANCELLED = 'CANCELLED',
 }

@@ -5,6 +5,7 @@ import {
 } from '@nestjs/common';
 import { TransactionService } from 'src/common/services/transaction.service';
 import { DreamInterviewRepository } from 'src/dreams/repository/dream-interview.repository';
+import { DreamRepository } from 'src/dreams/repository/dream.repository';
 import { OpenAiService } from '../../openai/services/openai.service';
 import { AnswerDreamInterviewDto } from '../dto/request/answer-dream-interview.dto';
 import {
@@ -21,6 +22,7 @@ import {
 export class DreamInterviewService {
   constructor(
     private readonly interviewRepo: DreamInterviewRepository,
+    private readonly dreamRepo: DreamRepository,
     private readonly openAiService: OpenAiService,
     private readonly transactionService: TransactionService,
   ) {}
@@ -36,11 +38,7 @@ export class DreamInterviewService {
 
         // 2. 첫 AI 메시지 생성 (Responses API 활용)
         const { output, responseId } =
-          await this.openAiService.chatForDreamInterview({
-            userInput: '꿈을 꿨어요.',
-            model: 'gpt-4o-mini',
-            store: true,
-          });
+          await this.openAiService.generateInterviewQuestion();
 
         await Promise.all([
           this.interviewRepo.createMessage(
@@ -124,14 +122,40 @@ export class DreamInterviewService {
     );
   }
 
-  async endInterview(interviewId: string): Promise<DreamInterviewDataDto> {
-    // TODO: 분석 비동기 처리
+  async endInterview(
+    interviewId: string,
+    userId: string,
+  ): Promise<DreamInterviewDataDto> {
     await this.interviewRepo.updateInterview({
       id: interviewId,
-      status: DreamInterviewStatus.COMPLETED,
+      status: DreamInterviewStatus.CONVERTING,
       endedAt: new Date(),
       result: '이 꿈은 불안감을 의미할 수 있습니다.',
     });
+
+    const interview = await this.interviewRepo.findInterviewById(interviewId);
+
+    // TODO: 비동기 큐로 관리
+    this.openAiService
+      .generateDreamEntity(interview.previousResponseId)
+      .then((dream) =>
+        this.dreamRepo.createDream({
+          ...dream,
+          userId,
+        }),
+      )
+      .then(() =>
+        this.interviewRepo.updateInterview({
+          id: interviewId,
+          status: DreamInterviewStatus.COMPLETED,
+        }),
+      )
+      .catch(() => {
+        this.interviewRepo.updateInterview({
+          id: interviewId,
+          status: DreamInterviewStatus.CANCELLED,
+        });
+      });
 
     return this._toDataDto(
       await this.interviewRepo.findInterviewById(interviewId),
@@ -173,7 +197,9 @@ export class DreamInterviewService {
       items: interviews.map((interview) => ({
         id: interview.id,
         status: interview.status,
-        lastMessage: interview.messages[interview.messages.length - 1],
+        lastMessage: interview.messages
+          ? interview.messages[interview.messages.length - 1]
+          : null,
         startedAt: interview.startedAt,
         endedAt: interview.endedAt,
         createdAt: interview.createdAt,

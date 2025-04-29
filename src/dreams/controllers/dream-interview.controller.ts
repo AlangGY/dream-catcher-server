@@ -10,7 +10,7 @@ import {
 import { DreamInterviewService } from '../services/dream-interview.service';
 
 @ApiTags('꿈 인터뷰')
-@Controller('dreams/interview')
+@Controller('dream-interview')
 export class DreamInterviewController {
   constructor(private readonly dreamInterviewService: DreamInterviewService) {}
 
@@ -68,8 +68,12 @@ export class DreamInterviewController {
   })
   async endInterview(
     @Body('interviewId') interviewId: string,
+    @CurrentUser() user: User,
   ): Promise<DreamInterviewResponseDto> {
-    const data = await this.dreamInterviewService.endInterview(interviewId);
+    const data = await this.dreamInterviewService.endInterview(
+      interviewId,
+      user.id,
+    );
     return { status: 'success', data };
   }
 

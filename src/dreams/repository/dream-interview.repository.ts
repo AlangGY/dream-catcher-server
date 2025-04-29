@@ -87,6 +87,7 @@ export class DreamInterviewRepository implements IDreamInterviewRepository {
     limit: number,
     entityManager?: EntityManager,
   ): Promise<[DreamInterviewEntity[], number]> {
+    console.log('findInterviewsAndCount', userId, page, limit);
     const manager = this.getManager(entityManager);
     const [interviews, total] = await manager.findAndCount(
       DreamInterviewEntity,
