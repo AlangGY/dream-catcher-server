@@ -1,12 +1,12 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { User } from '../auth/entities/user.entity';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { DreamsService } from 'src/dreams/services/dreams.service';
+import { User } from '../../auth/entities/user.entity';
+import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
+import { CreateDreamDto } from '../dto/request/create-dream.dto';
+import { GetDreamsDto } from '../dto/request/get-dreams.dto';
+import { UpdateDreamDto } from '../dto/request/update-dream.dto';
+import { DreamResponseDto } from '../dto/response/dream-response.dto';
 import { DreamsController } from './dreams.controller';
-import { DreamsService } from './dreams.service';
-import { CreateDreamDto } from './dto/request/create-dream.dto';
-import { GetDreamsDto } from './dto/request/get-dreams.dto';
-import { UpdateDreamDto } from './dto/request/update-dream.dto';
-import { DreamResponseDto } from './dto/response/dream-response.dto';
 
 describe('DreamsController', () => {
   let controller: DreamsController;
@@ -31,6 +31,7 @@ describe('DreamsController', () => {
       content: '테스트 꿈 내용',
       date: '2024-03-20',
       mood: 'HAPPY',
+      color: '#000000',
       userId: mockUser.id,
       analysis: null,
       createdAt: new Date(),
@@ -83,6 +84,7 @@ describe('DreamsController', () => {
         content: '테스트 꿈 내용',
         date: '2024-03-20',
         mood: 'HAPPY',
+        color: '#000000',
       };
 
       const result = await controller.createDream(createDreamDto, mockUser);
@@ -136,6 +138,7 @@ describe('DreamsController', () => {
         content: '수정된 꿈 내용',
         date: '2024-03-20',
         mood: 'HAPPY',
+        color: '#000000',
       };
 
       const result = await controller.updateDream(

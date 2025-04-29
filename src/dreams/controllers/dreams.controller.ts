@@ -19,21 +19,21 @@ import {
 } from '@nestjs/swagger';
 import { ErrorResponseDto } from 'src/common/dto/response/common-response.dto';
 import { GetDreamsDto } from 'src/dreams/dto/request/get-dreams.dto';
-import { CurrentUser } from '../auth/decorators/current-user.decorator';
-import { User } from '../auth/entities/user.entity';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { DreamsService } from './dreams.service';
-import { CreateDreamDto } from './dto/request/create-dream.dto';
-import { UpdateDreamDto } from './dto/request/update-dream.dto';
+import { CurrentUser } from '../../auth/decorators/current-user.decorator';
+import { User } from '../../auth/entities/user.entity';
+import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
+import { CreateDreamDto } from '../dto/request/create-dream.dto';
+import { UpdateDreamDto } from '../dto/request/update-dream.dto';
 import {
   DreamListResponseDto,
   DreamResponseDto,
-} from './dto/response/dream-response.dto';
+} from '../dto/response/dream-response.dto';
 import {
   CreateDreamWithUserId,
   GetDreamsWithUserId,
   UpdateDreamWithUserId,
-} from './interfaces/interfaces';
+} from '../interfaces/interfaces';
+import { DreamsService } from '../services/dreams.service';
 
 @ApiTags('꿈')
 @ApiBearerAuth('access-token')

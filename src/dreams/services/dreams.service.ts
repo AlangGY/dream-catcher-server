@@ -1,16 +1,16 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { TransactionService } from 'src/common/services/transaction.service';
+import {
+  DreamListResponseData,
+  DreamListResponseDto,
+  DreamResponseDto,
+} from 'src/dreams/dto/response/dream-response.dto';
 import {
   CreateDreamWithUserId,
   GetDreamsWithUserId,
   UpdateDreamWithUserId,
 } from 'src/dreams/interfaces/interfaces';
-import { TransactionService } from '../common/services/transaction.service';
-import {
-  DreamListResponseData,
-  DreamListResponseDto,
-  DreamResponseDto,
-} from './dto/response/dream-response.dto';
-import { DreamRepository } from './repository/dream.repository';
+import { DreamRepository } from 'src/dreams/repository/dream.repository';
 
 export interface IDreamsService {
   createDream(
