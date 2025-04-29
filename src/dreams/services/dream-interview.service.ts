@@ -147,6 +147,7 @@ export class DreamInterviewService {
       endedAt: interview.endedAt,
       result: interview.result,
       messages: (interview.messages || []).map((msg) => ({
+        id: msg.id,
         order: msg.order,
         speaker: msg.speaker,
         message: msg.message,

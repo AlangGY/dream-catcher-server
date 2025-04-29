@@ -4,6 +4,9 @@ import { DreamInterviewSpeaker } from '../../entities/dream-interview-question.e
 import { DreamInterviewStatus } from '../../entities/dream-interview.entity';
 
 export class DreamInterviewMessageDto {
+  @ApiProperty({ description: '메시지 ID', example: 'message-uuid-1234' })
+  id: string;
+
   @ApiProperty({ description: '메시지 순서', example: 1 })
   order: number;
 
